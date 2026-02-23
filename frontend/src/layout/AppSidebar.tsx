@@ -7,7 +7,7 @@ import {
   ChevronDownIcon,
 } from "../icons";
 
-// ─── Custom emoji icons for Agency Tracker nav ────────────────────────────────
+// ─── Emoji icons for nav items ────────────────────────────────────────────────
 const EmojiIcon = ({ emoji }: { emoji: string }) => (
   <span className="text-base leading-none">{emoji}</span>
 );
@@ -111,15 +111,20 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo */}
-      <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
+      <div className={`py-6 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link to="/" className="flex items-center gap-2">
           {isExpanded || isHovered || isMobileOpen ? (
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">📊</span>
-              <span className="text-lg font-bold text-gray-800 dark:text-white/90">Agency Tracker</span>
-            </div>
+            <img
+              src="/hsd-logo.png"
+              alt="Health Scale Digital"
+              className="h-8 w-auto object-contain dark:brightness-0 dark:invert"
+            />
           ) : (
-            <span className="text-2xl">📊</span>
+            <img
+              src="/hsd-logo.png"
+              alt="HSD"
+              className="h-8 w-8 object-contain object-left dark:brightness-0 dark:invert"
+            />
           )}
         </Link>
       </div>

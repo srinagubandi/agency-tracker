@@ -84,8 +84,7 @@ const AppHeader: React.FC = () => {
           </button>
 
           <Link to="/" className="lg:hidden flex items-center gap-2">
-            <span className="text-xl">📊</span>
-            <span className="text-base font-bold text-gray-800 dark:text-white/90">Agency Tracker</span>
+            <img src="/hsd-logo.png" alt="Health Scale Digital" className="h-7 w-auto object-contain dark:brightness-0 dark:invert" />
           </Link>
 
           <button

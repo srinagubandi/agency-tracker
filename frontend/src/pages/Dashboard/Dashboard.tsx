@@ -1,6 +1,6 @@
 /**
  * Dashboard — Agency Tracker
- * Shows KPI cards and recent time entries using TailAdmin design system.
+ * Shows KPI cards and recent time entries using Agency Tracker design system.
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
