@@ -6,13 +6,13 @@ WORKDIR /app/frontend
 # Copy frontend package files
 COPY frontend/package.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (--legacy-peer-deps needed for @ssa-ui-kit/core peer dep conflicts)
+RUN npm install --legacy-peer-deps
 
 # Copy frontend source
 COPY frontend/ ./
 
-# Build the Vite app
+# Build the webpack app
 RUN npm run build
 
 # ─── Stage 2: Backend + serve frontend ────────────────────────────────────────
@@ -22,7 +22,7 @@ WORKDIR /app
 
 # Install backend dependencies
 COPY backend/package.json ./
-RUN npm install --omit=dev
+RUN npm install --legacy-peer-deps --omit=dev
 
 # Copy backend source
 COPY backend/src/ ./src/
