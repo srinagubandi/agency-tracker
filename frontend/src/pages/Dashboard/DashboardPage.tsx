@@ -1,10 +1,6 @@
-/**
- * DashboardPage — KPI overview cards + recent activity.
- * Uses SSA UI Kit: WidgetCard, Typography, Icon, Badge.
- */
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { WidgetCard, Typography, Icon, Badge } from '../../components/ui';
+import { Icon } from '../../components/ui';
 import api from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
@@ -15,8 +11,14 @@ const Grid = styled.div`
   margin-bottom: 32px;
 `;
 
-const KpiCard = styled(WidgetCard)`
+const KpiCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const KpiValue = styled.div`
@@ -50,8 +52,11 @@ const SectionTitle = styled.h2`
   margin: 0 0 16px;
 `;
 
-const ActivityCard = styled(WidgetCard)`
-  padding: 0;
+const ActivityCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  overflow: hidden;
 `;
 
 const ActivityItem = styled.div`
@@ -200,7 +205,7 @@ const DashboardPage: React.FC = () => {
       </Grid>
 
       <SectionTitle>Recent Activity</SectionTitle>
-      <ActivityCard title="">
+      <ActivityCard>
         {activity.length === 0 && !loading && (
           <div style={{ padding: '24px 20px', color: '#9ca3af', fontSize: 14 }}>No recent activity.</div>
         )}
