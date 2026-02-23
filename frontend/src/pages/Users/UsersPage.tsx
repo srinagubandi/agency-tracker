@@ -78,7 +78,7 @@ const UsersPage: React.FC = () => {
 
   const handleDeactivate = async (id: number) => {
     if (!window.confirm('Deactivate this user?')) return;
-    await api.put(`/users/${id}`, { status: 'inactive' });
+    await api.patch(`/users/${id}/status`, { status: 'inactive' });
     fetchUsers();
   };
 

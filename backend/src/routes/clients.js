@@ -232,4 +232,53 @@ router.post('/:clientId/accounts', authenticate, requireRole('super_admin', 'man
   }
 });
 
+// ─── GET /clients/:clientId/websites ─────────────────────────────────────────
+router.get('/:clientId/websites', authenticate, async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    if (req.user.role === 'client' && req.user.client_id !== parseInt(clientId)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const result = await query(
+      'SELECT * FROM websites WHERE client_id = $1 ORDER BY name ASC',
+      [clientId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch websites' });
+  }
+});
+
+// ─── POST /clients/:clientId/websites ─────────────────────────────────────────
+router.post('/:clientId/websites', authenticate, requireRole('super_admin', 'manager'), async (req, res) => {
+  try {
+    const { account_id, name, url, status, notes } = req.body;
+    if (!name || !account_id) return res.status(400).json({ error: 'Name and account_id are required' });
+    const result = await query(
+      'INSERT INTO websites (account_id, client_id, name, url, status, notes) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [account_id, req.params.clientId, name, url || null, status || 'active', notes || null]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create website' });
+  }
+});
+
+// ─── GET /clients/:clientId/campaigns ─────────────────────────────────────────
+router.get('/:clientId/campaigns', authenticate, async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    if (req.user.role === 'client' && req.user.client_id !== parseInt(clientId)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    const result = await query(
+      'SELECT * FROM campaigns WHERE client_id = $1 ORDER BY name ASC',
+      [clientId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch campaigns' });
+  }
+});
+
 module.exports = router;

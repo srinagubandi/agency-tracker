@@ -69,7 +69,7 @@ module.exports = (env, argv) => {
       historyApiFallback: true,
       proxy: [
         {
-          context: ['/api', '/auth'],
+          context: ['/api', '/api/v1', '/auth', '/uploads'],
           target: 'http://localhost:3001',
         },
       ],

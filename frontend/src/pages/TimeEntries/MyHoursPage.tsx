@@ -31,7 +31,7 @@ const MyHoursPage: React.FC = () => {
 
   const fetchEntries = async () => {
     setLoading(true);
-    try { const r = await api.get('/time-entries/my'); setEntries(r.data.entries||r.data||[]); }
+    try { const r = await api.get('/time-entries'); setEntries(r.data.entries||r.data||[]); }
     finally { setLoading(false); }
   };
 

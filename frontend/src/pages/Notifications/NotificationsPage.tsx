@@ -24,8 +24,8 @@ const NotificationsPage: React.FC = () => {
 
   useEffect(() => { fetchNotifs(); }, []);
 
-  const markAllRead = async () => { await api.put('/notifications/read-all').catch(()=>{}); fetchNotifs(); };
-  const markRead = async (id:number) => { await api.put(`/notifications/${id}/read`).catch(()=>{}); fetchNotifs(); };
+  const markAllRead = async () => { await api.patch('/notifications/read-all').catch(()=>{}); fetchNotifs(); };
+  const markRead = async (id:number) => { await api.patch(`/notifications/${id}/read`).catch(()=>{}); fetchNotifs(); };
 
   const unreadCount = notifications.filter((n:any)=>!n.is_read).length;
 

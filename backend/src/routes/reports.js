@@ -258,4 +258,71 @@ router.get('/client-summary/:clientId', authenticate, async (req, res) => {
   }
 });
 
+// ─── GET /reports/dashboard-stats — Dashboard KPI stats ──────────────────────
+router.get('/dashboard-stats', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const role = req.user.role;
+
+    // Client count
+    let clientSql = 'SELECT COUNT(*) AS count FROM clients';
+    let clientParams = [];
+    if (role === 'manager') {
+      clientSql = 'SELECT COUNT(*) AS count FROM clients c JOIN client_managers cm ON cm.client_id = c.id WHERE cm.user_id = $1';
+      clientParams = [userId];
+    }
+    const clientCount = await query(clientSql, clientParams);
+
+    // Active campaign count
+    let campSql = "SELECT COUNT(*) AS count FROM campaigns WHERE status = 'active'";
+    let campParams = [];
+    if (role === 'manager') {
+      campSql = "SELECT COUNT(*) AS count FROM campaigns camp JOIN accounts a ON camp.client_id = a.client_id JOIN client_managers cm ON cm.client_id = camp.client_id WHERE cm.user_id = $1 AND camp.status = 'active'";
+      campParams = [userId];
+    } else if (role === 'client') {
+      campSql = "SELECT COUNT(*) AS count FROM campaigns WHERE client_id = $1 AND status = 'active'";
+      campParams = [req.user.client_id];
+    }
+    const campCount = await query(campSql, campParams);
+
+    // Hours this week
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+    let hoursSql = 'SELECT COALESCE(SUM(hours),0) AS total FROM time_entries WHERE date >= $1';
+    let hoursParams = [weekStartStr];
+    if (role === 'worker') {
+      hoursSql += ' AND user_id = $2';
+      hoursParams.push(userId);
+    } else if (role === 'manager') {
+      hoursSql += ' AND client_id IN (SELECT client_id FROM client_managers WHERE user_id = $2)';
+      hoursParams.push(userId);
+    } else if (role === 'client') {
+      hoursSql += ' AND client_id = $2';
+      hoursParams.push(req.user.client_id);
+    }
+    const weekHours = await query(hoursSql, hoursParams);
+
+    // Pending approvals
+    let pendingSql = "SELECT COUNT(*) AS count FROM time_entries WHERE status = 'pending'";
+    let pendingParams = [];
+    if (role === 'worker') {
+      pendingSql += ' AND user_id = $1';
+      pendingParams = [userId];
+    }
+    const pendingCount = await query(pendingSql, pendingParams);
+
+    res.json({
+      total_clients: parseInt(clientCount.rows[0]?.count || 0),
+      active_campaigns: parseInt(campCount.rows[0]?.count || 0),
+      hours_this_week: parseFloat(weekHours.rows[0]?.total || 0),
+      pending_approvals: parseInt(pendingCount.rows[0]?.count || 0),
+    });
+  } catch (err) {
+    console.error('Dashboard stats error:', err);
+    res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+  }
+});
+
 module.exports = router;

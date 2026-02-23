@@ -191,6 +191,35 @@ router.put('/:id', authenticate, async (req, res) => {
   }
 });
 
+
+// ─── PUT /time-entries/:id/approve — Approve time entry ──────────────────────
+router.put('/:id/approve', authenticate, requireRole('super_admin', 'manager'), async (req, res) => {
+  try {
+    const result = await query(
+      "UPDATE time_entries SET status = 'approved', updated_at = NOW() WHERE id = $1 RETURNING *",
+      [req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Time entry not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to approve time entry' });
+  }
+});
+
+// ─── PUT /time-entries/:id/reject — Reject time entry ────────────────────────
+router.put('/:id/reject', authenticate, requireRole('super_admin', 'manager'), async (req, res) => {
+  try {
+    const result = await query(
+      "UPDATE time_entries SET status = 'rejected', updated_at = NOW() WHERE id = $1 RETURNING *",
+      [req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Time entry not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to reject time entry' });
+  }
+});
+
 // ─── DELETE /time-entries/:id — Delete time entry (Super Admin only) ──────────
 router.delete('/:id', authenticate, requireRole('super_admin'), async (req, res) => {
   try {
