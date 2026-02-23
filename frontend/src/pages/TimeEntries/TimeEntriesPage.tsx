@@ -6,7 +6,7 @@ import api from '../../api/client';
 const PageHeader = styled.div`display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;`;
 const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0;`;
 const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;`;
-const StatusBadge = styled.span<{status:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({status})=>status==='approved'?'#dcfce7':status==='rejected'?'#fee2e2':'#fef3c7'};color:${({status})=>status==='approved'?'#16a34a':status==='rejected'?'#dc2626':'#d97706'};`;
+const StatusBadge = styled('span', { shouldForwardProp: (prop) => prop !== 'status' })<{status:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({status})=>status==='approved'?'#dcfce7':status==='rejected'?'#fee2e2':'#fef3c7'};color:${({status})=>status==='approved'?'#16a34a':status==='rejected'?'#dc2626':'#d97706'};`;
 const ActionBtn = styled.button`background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:#6b7280;&:hover{background:#f3f4f6;}`;
 const Overlay = styled.div`position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:1000;`;
 const ModalBox = styled.div`background:#fff;border-radius:16px;min-width:420px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.2);`;

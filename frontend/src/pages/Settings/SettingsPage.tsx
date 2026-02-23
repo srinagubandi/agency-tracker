@@ -9,7 +9,7 @@ const FieldGroup = styled.div`display:flex;flex-direction:column;gap:6px;margin-
 const FieldLabel = styled.label`font-size:13px;font-weight:500;color:#374151;`;
 const StyledInput = styled.input`width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box;&:focus{border-color:#2E6DA4;}`;
 const StyledSelect = styled.select`width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;background:#fff;box-sizing:border-box;&:focus{border-color:#2E6DA4;}`;
-const Msg = styled.p<{success?:boolean}>`font-size:13px;color:${({success})=>success?'#16a34a':'#dc2626'};padding:8px 12px;border-radius:6px;background:${({success})=>success?'#f0fdf4':'#fef2f2'};border:1px solid ${({success})=>success?'#bbf7d0':'#fecaca'};margin-bottom:16px;`;
+const Msg = styled('p', { shouldForwardProp: (prop) => prop !== 'success' })<{success?:boolean}>`font-size:13px;color:${({success})=>success?'#16a34a':'#dc2626'};padding:8px 12px;border-radius:6px;background:${({success})=>success?'#f0fdf4':'#fef2f2'};border:1px solid ${({success})=>success?'#bbf7d0':'#fecaca'};margin-bottom:16px;`;
 
 const TIMEZONES = ['UTC','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Toronto','Europe/London','Europe/Paris','Australia/Sydney'];
 

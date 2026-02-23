@@ -5,7 +5,7 @@ import api from '../../api/client';
 
 const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 24px;`;
 const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;`;
-const StatusBadge = styled.span<{active:boolean}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({active})=>active?'#dcfce7':'#f3f4f6'};color:${({active})=>active?'#16a34a':'#6b7280'};`;
+const StatusBadge = styled('span', { shouldForwardProp: (prop) => prop !== 'active' })<{active:boolean}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({active})=>active?'#dcfce7':'#f3f4f6'};color:${({active})=>active?'#16a34a':'#6b7280'};`;
 
 const PortalCampaigns: React.FC = () => {
   const [campaigns, setCampaigns] = useState<any[]>([]);

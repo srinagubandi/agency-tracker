@@ -5,7 +5,7 @@ import api from '../../api/client';
 
 const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 24px;`;
 const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;`;
-const RoleBadge = styled.span<{role:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({role})=>role==='manager'?'#e0f2fe':'#dcfce7'};color:${({role})=>role==='manager'?'#0284c7':'#16a34a'};`;
+const RoleBadge = styled('span', { shouldForwardProp: (prop) => prop !== 'role' })<{role:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({role})=>role==='manager'?'#e0f2fe':'#dcfce7'};color:${({role})=>role==='manager'?'#0284c7':'#16a34a'};`;
 
 const PortalTeam: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);

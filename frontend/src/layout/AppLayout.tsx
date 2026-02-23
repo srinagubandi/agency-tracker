@@ -17,7 +17,7 @@ const Shell = styled.div`
   background: #f4f6f8;
 `;
 
-const Sidebar = styled.nav<{ collapsed: boolean }>`
+const Sidebar = styled('nav', { shouldForwardProp: (prop) => prop !== 'collapsed' })<{ collapsed: boolean }>`
   width: ${({ collapsed }) => (collapsed ? '64px' : '240px')};
   min-height: 100vh;
   background: #ffffff;
@@ -89,7 +89,7 @@ const NavItem = styled.li`
   margin-bottom: 2px;
 `;
 
-const StyledNavLink = styled(NavLink)<{ collapsed: boolean }>`
+const StyledNavLink = styled(NavLink, { shouldForwardProp: (prop) => prop !== 'collapsed' })<{ collapsed: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -119,7 +119,7 @@ const StyledNavLink = styled(NavLink)<{ collapsed: boolean }>`
   }
 `;
 
-const NavLabel = styled.span<{ collapsed: boolean }>`
+const NavLabel = styled('span', { shouldForwardProp: (prop) => prop !== 'collapsed' })<{ collapsed: boolean }>`
   opacity: ${({ collapsed }) => (collapsed ? 0 : 1)};
   width: ${({ collapsed }) => (collapsed ? 0 : 'auto')};
   transition: opacity 0.15s, width 0.15s;
@@ -177,7 +177,7 @@ const UserName = styled.span`
   color: #1a1a2e;
 `;
 
-const RoleBadge = styled.span<{ role: string }>`
+const RoleBadge = styled('span', { shouldForwardProp: (prop) => prop !== 'role' })<{ role: string }>`
   font-size: 11px;
   font-weight: 600;
   padding: 2px 8px;

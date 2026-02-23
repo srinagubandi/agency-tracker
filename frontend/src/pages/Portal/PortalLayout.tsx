@@ -7,7 +7,7 @@ const Shell = styled.div`min-height:100vh;background:#f4f6f8;`;
 const Header = styled.header`background:#fff;border-bottom:1px solid #e8edf2;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;`;
 const Logo = styled.img`height:36px;object-fit:contain;`;
 const Nav = styled.nav`display:flex;gap:4px;`;
-const NavLink = styled(Link)<{active:string}>`padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;color:${({active})=>active==='true'?'#2E6DA4':'#6b7280'};background:${({active})=>active==='true'?'#eff6ff':'transparent'};&:hover{background:#f3f4f6;}`;
+const NavLink = styled(Link, { shouldForwardProp: (prop) => prop !== 'active' })<{active:string}>`padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;color:${({active})=>active==='true'?'#2E6DA4':'#6b7280'};background:${({active})=>active==='true'?'#eff6ff':'transparent'};&:hover{background:#f3f4f6;}`;
 const Content = styled.main`padding:32px;max-width:1200px;margin:0 auto;`;
 
 const PortalLayout: React.FC = () => {
