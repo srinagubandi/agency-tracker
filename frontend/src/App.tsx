@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@emotion/react';
-import { theme } from '@ssa-ui-kit/core';
+import { mainTheme } from '@ssa-ui-kit/core';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import LoginPage from './pages/Auth/LoginPage';
@@ -29,6 +29,35 @@ import PortalCampaigns from './pages/Portal/PortalCampaigns';
 import PortalTeam from './pages/Portal/PortalTeam';
 import PortalChangeLog from './pages/Portal/PortalChangeLog';
 
+// Error boundary to catch and display React render errors
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('React render error:', error, info);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, fontFamily: 'monospace', color: '#c00' }}>
+          <h2>Application Error</h2>
+          <pre>{this.state.error.message}</pre>
+          <pre>{this.state.error.stack}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const PrivateRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> = ({ children, roles }) => {
   const { user, loading } = useAuth();
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading...</div>;
@@ -42,6 +71,7 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/signin" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/accept-invite" element={<AcceptInvitePage />} />
@@ -72,13 +102,15 @@ const AppRoutes: React.FC = () => {
 };
 
 const App: React.FC = () => (
-  <ThemeProvider theme={theme}>
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
-  </ThemeProvider>
+  <ErrorBoundary>
+    <ThemeProvider theme={mainTheme}>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
+  </ErrorBoundary>
 );
 
 export default App;
