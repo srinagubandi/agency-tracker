@@ -97,15 +97,15 @@ const LogoText = styled.span`
 `;
 
 const ALL_NAV_ITEMS = [
-  { path: '/dashboard', iconName: 'home' as const, title: 'Dashboard', roles: ['super_admin', 'manager', 'worker', 'client'] },
-  { path: '/clients', iconName: 'company' as const, title: 'Clients', roles: ['super_admin', 'manager'] },
-  { path: '/time-entries', iconName: 'time-tracking' as const, title: 'All Time Entries', roles: ['super_admin', 'manager'] },
-  { path: '/my-hours', iconName: 'clock' as const, title: 'My Hours', roles: ['super_admin', 'manager', 'worker'] },
-  { path: '/reports', iconName: 'report' as const, title: 'Reports', roles: ['super_admin', 'manager'] },
-  { path: '/change-log', iconName: 'change' as const, title: 'Change Log', roles: ['super_admin', 'manager', 'worker'] },
-  { path: '/users', iconName: 'employee' as const, title: 'Users', roles: ['super_admin'] },
-  { path: '/notifications', iconName: 'notification' as const, title: 'Notifications', roles: ['super_admin', 'manager', 'worker'] },
-  { path: '/settings', iconName: 'settings' as const, title: 'Settings', roles: ['super_admin'] },
+  { path: 'dashboard', iconName: 'home' as const, title: 'Dashboard', roles: ['super_admin', 'manager', 'worker', 'client'] },
+  { path: 'clients', iconName: 'company' as const, title: 'Clients', roles: ['super_admin', 'manager'] },
+  { path: 'time-entries', iconName: 'time-tracking' as const, title: 'All Time Entries', roles: ['super_admin', 'manager'] },
+  { path: 'my-hours', iconName: 'clock' as const, title: 'My Hours', roles: ['super_admin', 'manager', 'worker'] },
+  { path: 'reports', iconName: 'report' as const, title: 'Reports', roles: ['super_admin', 'manager'] },
+  { path: 'change-log', iconName: 'change' as const, title: 'Change Log', roles: ['super_admin', 'manager', 'worker'] },
+  { path: 'users', iconName: 'employee' as const, title: 'Users', roles: ['super_admin'] },
+  { path: 'notifications', iconName: 'notification' as const, title: 'Notifications', roles: ['super_admin', 'manager', 'worker'] },
+  { path: 'settings', iconName: 'settings' as const, title: 'Settings', roles: ['super_admin'] },
 ];
 
 const AppLayout: React.FC = () => {
