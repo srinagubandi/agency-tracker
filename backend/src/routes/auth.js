@@ -189,8 +189,8 @@ router.post('/reset-password', async (req, res) => {
 // ─── POST /auth/invite (Super Admin only) ─────────────────────────────────────
 router.post('/invite', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Only Super Admins can invite users' });
+    if (!['super_admin', 'manager'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Only Admins and Managers can invite users' });
     }
 
     const { name, email, role, client_id } = req.body;
@@ -220,13 +220,23 @@ router.post('/invite', authenticate, async (req, res) => {
       [name, email.toLowerCase(), role, client_id || null, tokenHash, expires]
     );
 
+    // Build the invite link — return it in the response so admin can share it manually
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const inviteLink = `${frontendUrl}/accept-invite?token=${token}`;
+
+    // Try to send email but don't fail if email is not configured
     try {
       await sendInviteEmail(email, name, token, role);
     } catch (emailErr) {
-      console.error('Failed to send invite email:', emailErr.message);
+      console.error('Email not configured — invite link generated instead:', emailErr.message);
     }
 
-    res.status(201).json({ message: 'Invitation sent', user: result.rows[0] });
+    res.status(201).json({
+      message: 'Invitation created',
+      user: result.rows[0],
+      inviteLink,
+      inviteToken: token,
+    });
   } catch (err) {
     console.error('Invite error:', err);
     res.status(500).json({ error: 'Failed to send invitation' });

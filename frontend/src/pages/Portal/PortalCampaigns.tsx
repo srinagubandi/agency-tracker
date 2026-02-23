@@ -1,45 +1,37 @@
-import { useEffect, useState } from "react";
-import apiClient from "../../api/client";
-import PageMeta from "../../components/common/PageMeta";
+import React, { useEffect, useState } from 'react';
+import styled from '@emotion/styled';
+import { Table, TableHead, TableBody, TableRow, TableCell, TableCellHeader } from '@ssa-ui-kit/core';
+import api from '../../api/client';
 
-interface Campaign { id: string; name: string; type: string; status: string; start_date?: string; end_date?: string; budget?: number; total_hours: number; }
+const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 24px;`;
+const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;`;
+const StatusBadge = styled.span<{active:boolean}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({active})=>active?'#dcfce7':'#f3f4f6'};color:${({active})=>active?'#16a34a':'#6b7280'};`;
 
-export default function PortalCampaigns() {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+const PortalCampaigns: React.FC = () => {
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiClient.get("/campaigns").then((r) => setCampaigns(r.data || [])).finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>;
-
+  useEffect(() => { api.get('/campaigns').then(r=>setCampaigns(r.data.campaigns||r.data||[])).catch(()=>{}).finally(()=>setLoading(false)); }, []);
   return (
-    <>
-      <PageMeta title="Campaigns — Client Portal" description="Your campaigns" />
-      <div className="space-y-5">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Campaigns</h1>
-        {campaigns.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 py-16 text-center text-gray-400"><p className="text-4xl mb-3">🚀</p><p className="text-sm">No campaigns yet</p></div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {campaigns.map((c) => (
-              <div key={c.id} className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${c.status === "active" ? "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400" : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"}`}>{c.status}</span>
-                  <span className="text-xs text-gray-400 capitalize">{c.type}</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 dark:text-white/90 mb-2">{c.name}</h3>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">{c.total_hours || 0}h logged</span>
-                  {c.budget && <span className="text-gray-500 dark:text-gray-400">${c.budget.toLocaleString()} budget</span>}
-                </div>
-                {c.start_date && <p className="text-xs text-gray-400 mt-2">{c.start_date}{c.end_date ? ` → ${c.end_date}` : ""}</p>}
-              </div>
+    <div>
+      <PageTitle>Campaigns</PageTitle>
+      <Card>
+        <Table>
+          <TableHead><TableRow><TableCellHeader>Campaign</TableCellHeader><TableCellHeader>Type</TableCellHeader><TableCellHeader>Status</TableCellHeader><TableCellHeader>Start Date</TableCellHeader></TableRow></TableHead>
+          <TableBody>
+            {loading&&<TableRow><TableCell colSpan={4} style={{textAlign:'center',color:'#9ca3af',padding:'32px'}}>Loading...</TableCell></TableRow>}
+            {campaigns.map((c:any)=>(
+              <TableRow key={c.id}>
+                <TableCell style={{fontWeight:500}}>{c.name}</TableCell>
+                <TableCell style={{fontSize:13}}>{c.type||'—'}</TableCell>
+                <TableCell><StatusBadge active={c.status==='active'}>{c.status}</StatusBadge></TableCell>
+                <TableCell style={{fontSize:13,color:'#6b7280'}}>{c.start_date?new Date(c.start_date).toLocaleDateString():'—'}</TableCell>
+              </TableRow>
             ))}
-          </div>
-        )}
-      </div>
-    </>
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
   );
-}
+};
+
+export default PortalCampaigns;

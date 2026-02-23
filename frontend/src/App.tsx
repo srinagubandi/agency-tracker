@@ -1,100 +1,84 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import AppLayout from "./layout/AppLayout";
-import { ScrollToTop } from "./components/common/ScrollToTop";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@emotion/react';
+import { theme } from '@ssa-ui-kit/core';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Auth pages
-import SignIn from "./pages/AuthPages/SignIn";
-import ForgotPassword from "./pages/AuthPages/ForgotPassword";
-import ResetPassword from "./pages/AuthPages/ResetPassword";
-import AcceptInvite from "./pages/AuthPages/AcceptInvite";
-import AuthCallback from "./pages/AuthPages/AuthCallback";
+import LoginPage from './pages/Auth/LoginPage';
+import ForgotPasswordPage from './pages/Auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/Auth/ResetPasswordPage';
+import AcceptInvitePage from './pages/Auth/AcceptInvitePage';
+import AuthCallbackPage from './pages/Auth/AuthCallbackPage';
 
-// Dashboard
-import Dashboard from "./pages/Dashboard/Dashboard";
+import AppLayout from './layout/AppLayout';
+import DashboardPage from './pages/Dashboard/DashboardPage';
+import ClientsPage from './pages/Clients/ClientsPage';
+import ClientDetailPage from './pages/Clients/ClientDetailPage';
+import TimeEntriesPage from './pages/TimeEntries/TimeEntriesPage';
+import MyHoursPage from './pages/TimeEntries/MyHoursPage';
+import ReportsPage from './pages/Reports/ReportsPage';
+import ChangeLogPage from './pages/ChangeLog/ChangeLogPage';
+import UsersPage from './pages/Users/UsersPage';
+import NotificationsPage from './pages/Notifications/NotificationsPage';
+import SettingsPage from './pages/Settings/SettingsPage';
 
-// Clients & hierarchy
-import ClientsPage from "./pages/Clients/ClientsPage";
-import ClientDetailPage from "./pages/Clients/ClientDetailPage";
-import WebsiteDetailPage from "./pages/Clients/WebsiteDetailPage";
-import CampaignDetailPage from "./pages/Clients/CampaignDetailPage";
+import PortalLayout from './pages/Portal/PortalLayout';
+import PortalDashboard from './pages/Portal/PortalDashboard';
+import PortalHours from './pages/Portal/PortalHours';
+import PortalCampaigns from './pages/Portal/PortalCampaigns';
+import PortalTeam from './pages/Portal/PortalTeam';
+import PortalChangeLog from './pages/Portal/PortalChangeLog';
 
-// Time tracking
-import TimeEntriesPage from "./pages/TimeEntries/TimeEntriesPage";
-import MyHoursPage from "./pages/TimeEntries/MyHoursPage";
-
-// Reports & logs
-import ReportsPage from "./pages/Reports/ReportsPage";
-import ChangeLogPage from "./pages/ChangeLog/ChangeLogPage";
-
-// Admin
-import UsersPage from "./pages/Users/UsersPage";
-import NotificationsPage from "./pages/Notifications/NotificationsPage";
-import SettingsPage from "./pages/Settings/SettingsPage";
-
-// Client portal
-import PortalLayout from "./pages/Portal/PortalLayout";
-import PortalDashboard from "./pages/Portal/PortalDashboard";
-import PortalHours from "./pages/Portal/PortalHours";
-import PortalCampaigns from "./pages/Portal/PortalCampaigns";
-import PortalTeam from "./pages/Portal/PortalTeam";
-import PortalChangeLog from "./pages/Portal/PortalChangeLog";
-
-import NotFound from "./pages/OtherPage/NotFound";
-
-// ─── Protected Route wrapper ───────────────────────────────────────────────────
-function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
+const PrivateRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> = ({ children, roles }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading...</div>;
   if (!user) return <Navigate to="/signin" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
+  if (roles && !roles.includes(user.role)) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
-}
+};
 
-export default function App() {
+const AppRoutes: React.FC = () => {
+  const { user } = useAuth();
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* ── Auth pages ─────────────────────────────────────────────── */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/login" element={<Navigate to="/signin" replace />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/accept-invite" element={<AcceptInvite />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-
-          {/* ── Client Portal ──────────────────────────────────────────── */}
-          <Route path="/portal" element={<ProtectedRoute allowedRoles={["client"]}><PortalLayout /></ProtectedRoute>}>
-            <Route index element={<PortalDashboard />} />
-            <Route path="hours" element={<PortalHours />} />
-            <Route path="campaigns" element={<PortalCampaigns />} />
-            <Route path="team" element={<PortalTeam />} />
-            <Route path="changelog" element={<PortalChangeLog />} />
-          </Route>
-
-          {/* ── Main app (authenticated, non-client) ───────────────────── */}
-          <Route element={<ProtectedRoute allowedRoles={["super_admin","manager","worker"]}><AppLayout /></ProtectedRoute>}>
-            <Route index path="/" element={<Dashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/clients" element={<ClientsPage />} />
-            <Route path="/clients/:id" element={<ClientDetailPage />} />
-            <Route path="/websites/:id" element={<WebsiteDetailPage />} />
-            <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
-            <Route path="/time-entries" element={<TimeEntriesPage />} />
-            <Route path="/my-hours" element={<MyHoursPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/changelog" element={<ChangeLogPage />} />
-            <Route path="/users" element={<ProtectedRoute allowedRoles={["super_admin","manager"]}><UsersPage /></ProtectedRoute>} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/settings" element={<ProtectedRoute allowedRoles={["super_admin"]}><SettingsPage /></ProtectedRoute>} />
-          </Route>
-
-          {/* ── Fallback ───────────────────────────────────────────────── */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <Routes>
+      <Route path="/signin" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/accept-invite" element={<AcceptInvitePage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/portal" element={<PrivateRoute roles={['client','super_admin','manager']}><PortalLayout /></PrivateRoute>}>
+        <Route index element={<PortalDashboard />} />
+        <Route path="hours" element={<PortalHours />} />
+        <Route path="campaigns" element={<PortalCampaigns />} />
+        <Route path="team" element={<PortalTeam />} />
+        <Route path="change-log" element={<PortalChangeLog />} />
+      </Route>
+      <Route path="/" element={<PrivateRoute><AppLayout /></PrivateRoute>}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="clients" element={<ClientsPage />} />
+        <Route path="clients/:id" element={<ClientDetailPage />} />
+        <Route path="time-entries" element={<PrivateRoute roles={['super_admin','manager']}><TimeEntriesPage /></PrivateRoute>} />
+        <Route path="my-hours" element={<MyHoursPage />} />
+        <Route path="reports" element={<PrivateRoute roles={['super_admin','manager']}><ReportsPage /></PrivateRoute>} />
+        <Route path="change-log" element={<ChangeLogPage />} />
+        <Route path="users" element={<PrivateRoute roles={['super_admin','manager']}><UsersPage /></PrivateRoute>} />
+        <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="settings" element={<PrivateRoute roles={['super_admin']}><SettingsPage /></PrivateRoute>} />
+      </Route>
+      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/signin'} replace />} />
+    </Routes>
   );
-}
+};
+
+const App: React.FC = () => (
+  <ThemeProvider theme={theme}>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  </ThemeProvider>
+);
+
+export default App;

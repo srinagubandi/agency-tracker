@@ -1,198 +1,118 @@
-/**
- * Time Entries Page — Agency Tracker
- * Log hours, view/approve/reject entries.
- */
-import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import apiClient from "../../api/client";
-import PageMeta from "../../components/common/PageMeta";
-import Button from "../../components/ui/button/Button";
-import Label from "../../components/form/Label";
-import Input from "../../components/form/input/InputField";
+import React, { useEffect, useState } from 'react';
+import styled from '@emotion/styled';
+import { Button, Icon, Table, TableHead, TableBody, TableRow, TableCell, TableCellHeader } from '@ssa-ui-kit/core';
+import api from '../../api/client';
 
-interface Client { id: string; name: string; }
-interface Campaign { id: string; name: string; client_id: string; client_name: string; }
-interface TimeEntry { id: string; user_name: string; client_name: string; campaign_name: string; date: string; hours: number; notes?: string; status: string; }
+const PageHeader = styled.div`display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;`;
+const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0;`;
+const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;`;
+const StatusBadge = styled.span<{status:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({status})=>status==='approved'?'#dcfce7':status==='rejected'?'#fee2e2':'#fef3c7'};color:${({status})=>status==='approved'?'#16a34a':status==='rejected'?'#dc2626':'#d97706'};`;
+const ActionBtn = styled.button`background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:#6b7280;&:hover{background:#f3f4f6;}`;
+const Overlay = styled.div`position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:1000;`;
+const ModalBox = styled.div`background:#fff;border-radius:16px;min-width:420px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.2);`;
+const ModalTitle = styled.h3`font-size:18px;font-weight:600;margin:0 0 20px;`;
+const FieldGroup = styled.div`display:flex;flex-direction:column;gap:6px;margin-bottom:16px;`;
+const FieldLabel = styled.label`font-size:13px;font-weight:500;color:#374151;`;
+const StyledInput = styled.input`width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box;&:focus{border-color:#2E6DA4;}`;
+const StyledSelect = styled.select`width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;background:#fff;box-sizing:border-box;&:focus{border-color:#2E6DA4;}`;
+const ModalFooter = styled.div`display:flex;gap:10px;justify-content:flex-end;margin-top:8px;`;
 
-export default function TimeEntriesPage() {
-  const { user } = useAuth();
-  const [entries, setEntries] = useState<TimeEntry[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [filteredCampaigns, setFilteredCampaigns] = useState<Campaign[]>([]);
+const TimeEntriesPage: React.FC = () => {
+  const [entries, setEntries] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ client_id: "", campaign_id: "", date: new Date().toISOString().split("T")[0], hours: "", notes: "" });
+  const [form, setForm] = useState({client_id:'',campaign_id:'',hours:'',date:new Date().toISOString().split('T')[0],description:''});
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
 
-  const fetchEntries = () => {
-    const params = filterStatus !== "all" ? `?status=${filterStatus}` : "";
-    apiClient.get(`/time-entries${params}`).then((r) => {
-      setEntries(r.data?.entries || r.data || []);
-    }).finally(() => setLoading(false));
+  const fetchEntries = async () => {
+    setLoading(true);
+    try { const r = await api.get('/time-entries'); setEntries(r.data.entries||r.data||[]); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => {
-    Promise.all([
-      apiClient.get("/clients"),
-      apiClient.get("/campaigns"),
-    ]).then(([clientsRes, campaignsRes]) => {
-      setClients(clientsRes.data || []);
-      setCampaigns(campaignsRes.data || []);
-    });
     fetchEntries();
+    api.get('/clients').then(r=>setClients(r.data.clients||r.data||[])).catch(()=>{});
   }, []);
 
-  useEffect(() => { fetchEntries(); }, [filterStatus]);
-
-  const handleClientChange = (clientId: string) => {
-    setForm({ ...form, client_id: clientId, campaign_id: "" });
-    setFilteredCampaigns(campaigns.filter((c) => c.client_id === clientId));
+  const onClientChange = async (clientId:string) => {
+    setForm(f=>({...f,client_id:clientId,campaign_id:''}));
+    if(clientId) {
+      try { const r = await api.get(`/clients/${clientId}/campaigns`); setCampaigns(r.data.campaigns||r.data||[]); }
+      catch { setCampaigns([]); }
+    } else { setCampaigns([]); }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true); setError("");
+  const handleSave = async () => {
+    if(!form.campaign_id||!form.hours||!form.date) return;
+    setSaving(true);
     try {
-      await apiClient.post("/time-entries", { campaign_id: form.campaign_id, date: form.date, hours: parseFloat(form.hours), notes: form.notes });
-      fetchEntries();
-      setShowModal(false);
-      setForm({ client_id: "", campaign_id: "", date: new Date().toISOString().split("T")[0], hours: "", notes: "" });
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to log time");
-    } finally { setSaving(false); }
+      await api.post('/time-entries', {campaign_id:parseInt(form.campaign_id),hours:parseFloat(form.hours),date:form.date,description:form.description});
+      setShowModal(false); fetchEntries();
+    } catch(e){console.error(e);}
+    finally{setSaving(false);}
   };
 
-  const handleApprove = async (id: string) => {
-    await apiClient.patch(`/time-entries/${id}/approve`);
-    fetchEntries();
-  };
-
-  const handleReject = async (id: string) => {
-    await apiClient.patch(`/time-entries/${id}/reject`);
-    fetchEntries();
-  };
-
-  const canApprove = user?.role === "super_admin" || user?.role === "manager";
-
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>;
+  const handleApprove = async (id:number) => { await api.put(`/time-entries/${id}/approve`); fetchEntries(); };
+  const handleReject = async (id:number) => { await api.put(`/time-entries/${id}/reject`); fetchEntries(); };
 
   return (
-    <>
-      <PageMeta title="Time Entries — Agency Tracker" description="Log and manage time entries" />
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Time Entries</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{entries.length} entries</p>
-          </div>
-          <Button size="sm" onClick={() => setShowModal(true)}>+ Log Hours</Button>
-        </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-2">
-          {["all", "pending", "approved", "rejected"].map((s) => (
-            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterStatus === s ? "bg-brand-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"}`}>
-              {s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Table */}
-        <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
-          {entries.length === 0 ? (
-            <div className="py-16 text-center text-gray-400 dark:text-gray-500">
-              <p className="text-4xl mb-3">⏱️</p>
-              <p className="text-sm">No time entries found</p>
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-white/[0.03] border-b border-gray-200 dark:border-gray-800">
-                <tr>
-                  {canApprove && <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Team Member</th>}
-                  <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Client</th>
-                  <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Campaign</th>
-                  <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Date</th>
-                  <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Hours</th>
-                  <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
-                  {canApprove && <th className="text-left px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Actions</th>}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {entries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                    {canApprove && <td className="px-6 py-4 font-medium text-gray-800 dark:text-white/90">{entry.user_name}</td>}
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{entry.client_name}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{entry.campaign_name}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{entry.date}</td>
-                    <td className="px-6 py-4 font-semibold text-brand-500">{entry.hours}h</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${entry.status === "approved" ? "bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400" : entry.status === "rejected" ? "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400" : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"}`}>{entry.status}</span>
-                    </td>
-                    {canApprove && (
-                      <td className="px-6 py-4">
-                        {entry.status === "pending" && (
-                          <div className="flex items-center gap-2">
-                            <button onClick={() => handleApprove(entry.id)} className="text-xs font-medium text-green-600 hover:text-green-700 dark:text-green-400">Approve</button>
-                            <button onClick={() => handleReject(entry.id)} className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400">Reject</button>
-                          </div>
-                        )}
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-
-      {/* Log Hours Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-gray-800 dark:text-white/90">Log Hours</h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
-            </div>
-            {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label>Client <span className="text-error-500">*</span></Label>
-                <select value={form.client_id} onChange={(e) => handleClientChange(e.target.value)} className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                  <option value="">Select client…</option>
-                  {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <Label>Campaign <span className="text-error-500">*</span></Label>
-                <select value={form.campaign_id} onChange={(e) => setForm({ ...form, campaign_id: e.target.value })} disabled={!form.client_id} className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50">
-                  <option value="">Select campaign…</option>
-                  {filteredCampaigns.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <Label>Date <span className="text-error-500">*</span></Label>
-                <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              </div>
-              <div>
-                <Label>Hours <span className="text-error-500">*</span></Label>
-                <Input type="number" placeholder="0.5" min="0.25" max="24" step={0.25} value={form.hours} onChange={(e) => setForm({ ...form, hours: e.target.value })} />
-              </div>
-              <div>
-                <Label>Notes</Label>
-                <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} placeholder="What did you work on?" className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" />
-              </div>
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" className="flex-1" onClick={() => setShowModal(false)}>Cancel</Button>
-                <Button className="flex-1" disabled={saving}>{saving ? "Saving…" : "Log Hours"}</Button>
-              </div>
-            </form>
-          </div>
-        </div>
+    <div>
+      <PageHeader>
+        <PageTitle>All Time Entries</PageTitle>
+        <Button variant="primary" startIcon={<Icon name="plus" size={16}/>} onClick={()=>setShowModal(true)}>Log Hours</Button>
+      </PageHeader>
+      <Card>
+        <Table>
+          <TableHead><TableRow>
+            <TableCellHeader>Employee</TableCellHeader>
+            <TableCellHeader>Client</TableCellHeader>
+            <TableCellHeader>Campaign</TableCellHeader>
+            <TableCellHeader>Hours</TableCellHeader>
+            <TableCellHeader>Date</TableCellHeader>
+            <TableCellHeader>Status</TableCellHeader>
+            <TableCellHeader>Actions</TableCellHeader>
+          </TableRow></TableHead>
+          <TableBody>
+            {loading&&<TableRow><TableCell colSpan={7} style={{textAlign:'center',color:'#9ca3af',padding:'32px'}}>Loading...</TableCell></TableRow>}
+            {!loading&&entries.length===0&&<TableRow><TableCell colSpan={7} style={{textAlign:'center',color:'#9ca3af',padding:'32px'}}>No time entries yet.</TableCell></TableRow>}
+            {entries.map((e:any)=>(
+              <TableRow key={e.id}>
+                <TableCell style={{fontSize:13}}>{e.user_name}</TableCell>
+                <TableCell style={{fontSize:13}}>{e.client_name||'—'}</TableCell>
+                <TableCell style={{fontSize:13}}>{e.campaign_name||'—'}</TableCell>
+                <TableCell style={{fontWeight:600,color:'#2E6DA4'}}>{e.hours}h</TableCell>
+                <TableCell style={{fontSize:13,color:'#6b7280'}}>{new Date(e.date).toLocaleDateString()}</TableCell>
+                <TableCell><StatusBadge status={e.status}>{e.status}</StatusBadge></TableCell>
+                <TableCell>
+                  {e.status==='pending'&&<>
+                    <ActionBtn onClick={()=>handleApprove(e.id)} title="Approve"><Icon name="check" size={16}/></ActionBtn>
+                    <ActionBtn onClick={()=>handleReject(e.id)} title="Reject"><Icon name="cross" size={16}/></ActionBtn>
+                  </>}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+      {showModal&&(
+        <Overlay><ModalBox>
+          <ModalTitle>Log Hours</ModalTitle>
+          <FieldGroup><FieldLabel>Client</FieldLabel><StyledSelect value={form.client_id} onChange={e=>onClientChange(e.target.value)}><option value="">Select client...</option>{clients.map((c:any)=><option key={c.id} value={c.id}>{c.name}</option>)}</StyledSelect></FieldGroup>
+          <FieldGroup><FieldLabel>Campaign</FieldLabel><StyledSelect value={form.campaign_id} onChange={e=>setForm({...form,campaign_id:e.target.value})}><option value="">Select campaign...</option>{campaigns.map((c:any)=><option key={c.id} value={c.id}>{c.name}</option>)}</StyledSelect></FieldGroup>
+          <FieldGroup><FieldLabel>Hours</FieldLabel><StyledInput type="number" min="0.25" max="24" step="0.25" value={form.hours} onChange={e=>setForm({...form,hours:e.target.value})} placeholder="e.g. 2.5"/></FieldGroup>
+          <FieldGroup><FieldLabel>Date</FieldLabel><StyledInput type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/></FieldGroup>
+          <FieldGroup><FieldLabel>Description</FieldLabel><StyledInput value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="What did you work on?"/></FieldGroup>
+          <ModalFooter>
+            <Button variant="secondary" onClick={()=>setShowModal(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleSave} isDisabled={saving}>{saving?'Saving...':'Log Hours'}</Button>
+          </ModalFooter>
+        </ModalBox></Overlay>
       )}
-    </>
+    </div>
   );
-}
+};
+
+export default TimeEntriesPage;
