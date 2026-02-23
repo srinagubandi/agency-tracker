@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@emotion/react';
-import { mainTheme } from '@ssa-ui-kit/core';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import LoginPage from './pages/Auth/LoginPage';
@@ -103,13 +101,11 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => (
   <ErrorBoundary>
-    <ThemeProvider theme={mainTheme}>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   </ErrorBoundary>
 );
 

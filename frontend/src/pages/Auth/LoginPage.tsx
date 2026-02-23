@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Button, Typography } from '@ssa-ui-kit/core';
 import { useAuth } from '../../context/AuthContext';
 
 /* ─── Styled components ───────────────────────────────────────────────────── */
@@ -125,7 +124,7 @@ const LoginPage: React.FC = () => {
       <LoginCard>
         <LogoSection>
           <Logo src="/hsd-logo.png" alt="Health Scale Digital" />
-          <Typography variant="h2" weight="bold">Sign In</Typography>
+          <h2 style={{fontSize:'22px',fontWeight:700,color:'#1a1a2e',margin:'0 0 4px'}}>Sign In</h2>
           <Subtitle>Agency Tracker — Health Scale Digital</Subtitle>
         </LogoSection>
 
@@ -159,14 +158,9 @@ const LoginPage: React.FC = () => {
             />
           </FieldGroup>
 
-          <Button
-            type="submit"
-            variant="primary"
-            block
-            isDisabled={loading}
-          >
+          <button type="submit" disabled={loading} style={{width:'100%',padding:'11px 20px',background:'#2E6DA4',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:600,cursor:loading?'not-allowed':'pointer',opacity:loading?0.6:1}}>
             {loading ? 'Signing in…' : 'Sign In'}
-          </Button>
+          </button>
         </Form>
       </LoginCard>
     </Page>

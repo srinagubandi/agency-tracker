@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Button } from '@ssa-ui-kit/core';
 import { useAuth } from '../../context/AuthContext';
 
 const Shell = styled.div`min-height:100vh;background:#f4f6f8;`;
@@ -29,7 +28,7 @@ const PortalLayout: React.FC = () => {
         </Nav>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <span style={{fontSize:13,color:'#6b7280'}}>{user?.name}</span>
-          <Button variant="tertiary" size="small" onClick={logout}>Sign Out</Button>
+          <button onClick={logout} style={{padding:'6px 14px',background:'transparent',color:'#6b7280',border:'1px solid #d1d5db',borderRadius:'6px',fontSize:'13px',fontWeight:500,cursor:'pointer'}}>Sign Out</button>
         </div>
       </Header>
       <Content><Outlet/></Content>

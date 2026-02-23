@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Button, Icon } from '@ssa-ui-kit/core';
 import api from '../../api/client';
 
 const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 24px;`;
@@ -55,9 +54,9 @@ const SettingsPage: React.FC = () => {
               {TIMEZONES.map(tz=><option key={tz} value={tz}>{tz}</option>)}
             </StyledSelect>
           </FieldGroup>
-          <Button type="submit" variant="primary" isDisabled={saving} startIcon={<Icon name="check" size={16}/>}>
+          <button type="submit" disabled={saving} style={{padding:'10px 24px',background:'#2E6DA4',color:'#fff',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:600,cursor:saving?'not-allowed':'pointer',opacity:saving?0.6:1}}>
             {saving?'Saving...':'Save Settings'}
-          </Button>
+          </button>
         </form>
       </Card>
     </div>

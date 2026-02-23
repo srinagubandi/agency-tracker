@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Button, Typography, Card } from '@ssa-ui-kit/core';
 import api from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
@@ -14,11 +13,13 @@ const Page = styled.div`
   padding: 24px;
 `;
 
-const FormCard = styled(Card)`
+const FormCard = styled.div`
   width: 100%;
   max-width: 420px;
   padding: 40px;
   border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 `;
 
 const Logo = styled.img`
@@ -92,9 +93,7 @@ const AcceptInvitePage: React.FC = () => {
     <Page>
       <FormCard>
         <Logo src="/hsd-logo.png" alt="Health Scale Digital" />
-        <Typography variant="h2" weight="bold" style={{ textAlign: 'center', marginBottom: 8 }}>
-          Accept Invitation
-        </Typography>
+        <h2 style={{fontSize:'22px',fontWeight:700,color:'#1a1a2e',textAlign:'center',marginBottom:8,marginTop:0}}>Accept Invitation</h2>
         <p style={{ textAlign: 'center', color: '#6b7280', fontSize: 14, marginBottom: 24 }}>
           Set up your account to get started.
         </p>
@@ -112,9 +111,9 @@ const AcceptInvitePage: React.FC = () => {
             <FieldLabel>Confirm Password</FieldLabel>
             <StyledInput type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Repeat password" />
           </FieldGroup>
-          <Button type="submit" variant="primary" block isDisabled={loading}>
+          <button type="submit" disabled={loading} style={{width:'100%',padding:'11px 20px',background:'#2E6DA4',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:600,cursor:loading?'not-allowed':'pointer',opacity:loading?0.6:1}}>
             {loading ? 'Setting up…' : 'Create Account'}
-          </Button>
+          </button>
         </form>
       </FormCard>
     </Page>

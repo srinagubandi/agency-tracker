@@ -4,10 +4,9 @@
  * Avoids CollapsibleNavBar due to a known crash with items that have no submenus.
  */
 import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { useTheme } from '@emotion/react';
-import { Icon, Button } from '@ssa-ui-kit/core';
+import { Icon } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 
 /* ─── Styled Components ─────────────────────────────────────────── */

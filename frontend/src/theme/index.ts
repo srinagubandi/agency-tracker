@@ -1,18 +1,19 @@
 /**
- * SSA UI Kit theme configuration.
- * We extend the main theme with Health Scale Digital brand colors.
+ * Health Scale Digital brand theme.
+ * Custom theme without SSA UI Kit dependency.
  */
-import { mainTheme } from '@ssa-ui-kit/core';
 
 // Health Scale Digital brand colors
-// Primary blue: #2E6DA4 (from the logo)
 export const hsdTheme = {
-  ...mainTheme,
   colors: {
-    ...((mainTheme as any).colors || {}),
     primary: '#2E6DA4',
     primaryDark: '#1d4f7a',
     primaryLight: '#4a8fc4',
+    text: '#1a1a2e',
+    textMuted: '#6b7280',
+    border: '#e8edf2',
+    background: '#f4f6f8',
+    white: '#ffffff',
   },
 };
 

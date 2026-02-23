@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Button, Icon } from '@ssa-ui-kit/core';
 import api from '../../api/client';
 
 const PageHeader = styled.div`display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;`;
@@ -33,7 +32,7 @@ const NotificationsPage: React.FC = () => {
     <div>
       <PageHeader>
         <PageTitle>Notifications {unreadCount>0&&<span style={{fontSize:14,fontWeight:400,color:'#2E6DA4',marginLeft:8}}>({unreadCount} unread)</span>}</PageTitle>
-        {unreadCount>0&&<Button variant="secondary" size="small" onClick={markAllRead}>Mark All Read</Button>}
+        {unreadCount>0&&<button onClick={markAllRead} style={{padding:'7px 14px',background:'#f3f4f6',color:'#374151',border:'1px solid #d1d5db',borderRadius:'6px',fontSize:'13px',fontWeight:500,cursor:'pointer'}}>Mark All Read</button>}
       </PageHeader>
       <Card>
         {loading&&<EmptyState>Loading...</EmptyState>}
