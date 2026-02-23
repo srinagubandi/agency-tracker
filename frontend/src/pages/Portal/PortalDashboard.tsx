@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { WidgetCard } from '@ssa-ui-kit/core';
+import { WidgetCard } from '../../components/ui';
 import api from '../../api/client';
 
 const Grid = styled.div`display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;margin-bottom:32px;`;

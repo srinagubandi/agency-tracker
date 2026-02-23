@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { WidgetCard, Typography, Icon, Badge } from '@ssa-ui-kit/core';
+import { WidgetCard, Typography, Icon, Badge } from '../../components/ui';
 import api from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 

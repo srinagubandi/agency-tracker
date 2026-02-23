@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Button, Icon, Table, TableHead, TableBody, TableRow, TableCell, TableCellHeader } from '@ssa-ui-kit/core';
+import { Button, Icon, Table, TableHead, TableBody, TableRow, TableCell, TableCellHeader } from '../../components/ui';
 import api from '../../api/client';
 
 const PageHeader = styled.div`display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;`;

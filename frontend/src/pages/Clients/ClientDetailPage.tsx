@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Button, Icon, Table, TableHead, TableBody, TableRow, TableCell, TableCellHeader } from '@ssa-ui-kit/core';
+import { Button, Icon, Table, TableHead, TableBody, TableRow, TableCell, TableCellHeader } from '../../components/ui';
 import api from '../../api/client';
 
 const Breadcrumb = styled.div`font-size:13px;color:#6b7280;margin-bottom:20px;a{color:#2E6DA4;text-decoration:none;}`;
