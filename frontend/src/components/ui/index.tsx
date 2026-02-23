@@ -31,7 +31,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
 }
 
-const StyledButton = styled.button<{ variant: string; size: string; disabled?: boolean }>`
+const StyledButton = styled('button', { shouldForwardProp: (prop) => prop !== 'variant' })<{ variant: string; size: string; disabled?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -190,7 +190,7 @@ const WidgetCardValue = styled.div`
   line-height: 1;
 `;
 
-const WidgetCardAccent = styled.div<{ color?: string }>`
+const WidgetCardAccent = styled('div', { shouldForwardProp: (prop) => prop !== 'color' })<{ color?: string }>`
   height: 3px;
   width: 40px;
   border-radius: 2px;
@@ -213,7 +213,7 @@ interface BadgeProps {
   children?: React.ReactNode;
 }
 
-const BadgeEl = styled.span<{ variant: string }>`
+const BadgeEl = styled('span', { shouldForwardProp: (prop) => prop !== 'variant' })<{ variant: string }>`
   display: inline-flex;
   align-items: center;
   font-size: 11px;

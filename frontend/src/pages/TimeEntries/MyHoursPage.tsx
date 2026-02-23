@@ -6,7 +6,7 @@ import api from '../../api/client';
 const PageHeader = styled.div`display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;`;
 const PageTitle = styled.h2`font-size:20px;font-weight:700;color:#1a1a2e;margin:0;`;
 const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;`;
-const StatusBadge = styled.span<{status:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({status})=>status==='approved'?'#dcfce7':status==='rejected'?'#fee2e2':'#fef3c7'};color:${({status})=>status==='approved'?'#16a34a':status==='rejected'?'#dc2626':'#d97706'};`;
+const StatusBadge = styled('span', { shouldForwardProp: (prop) => prop !== 'status' })<{status:string}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({status})=>status==='approved'?'#dcfce7':status==='rejected'?'#fee2e2':'#fef3c7'};color:${({status})=>status==='approved'?'#16a34a':status==='rejected'?'#dc2626':'#d97706'};`;
 const SummaryGrid = styled.div`display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px;`;
 const SummaryCard = styled.div`background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);`;
 const SummaryValue = styled.div`font-size:28px;font-weight:700;color:#2E6DA4;`;

@@ -11,7 +11,7 @@ const Card = styled.div`background:#fff;border-radius:12px;box-shadow:0 1px 4px 
 const InfoGrid = styled.div`display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:20px;`;
 const InfoLabel = styled.div`font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;letter-spacing:0.5px;margin-bottom:4px;`;
 const InfoValue = styled.div`font-size:14px;color:#1a1a2e;font-weight:500;`;
-const StatusBadge = styled.span<{active:boolean}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({active})=>active?'#dcfce7':'#f3f4f6'};color:${({active})=>active?'#16a34a':'#6b7280'};`;
+const StatusBadge = styled('span', { shouldForwardProp: (prop) => prop !== 'active' })<{active:boolean}>`font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${({active})=>active?'#dcfce7':'#f3f4f6'};color:${({active})=>active?'#16a34a':'#6b7280'};`;
 const Overlay = styled.div`position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:1000;`;
 const ModalBox = styled.div`background:#fff;border-radius:16px;min-width:400px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.2);`;
 const ModalTitle = styled.h3`font-size:18px;font-weight:600;margin:0 0 20px;`;

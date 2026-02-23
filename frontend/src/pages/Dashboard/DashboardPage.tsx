@@ -1,118 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
-import { Icon } from '../../components/ui';
 import api from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
-`;
-
-const KpiCard = styled.div`
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const KpiValue = styled.div`
-  font-size: 36px;
-  font-weight: 700;
-  color: #2E6DA4;
-  line-height: 1;
-  margin: 12px 0 4px;
-`;
-
-const KpiLabel = styled.div`
-  font-size: 13px;
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const KpiIcon = styled.div`
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(46, 109, 164, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a2e;
-  margin: 0 0 16px;
-`;
-
-const ActivityCard = styled.div`
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  overflow: hidden;
-`;
-
-const ActivityItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 20px;
-  border-bottom: 1px solid #f3f4f6;
-  &:last-child { border-bottom: none; }
-`;
-
-const ActivityDot = styled.div<{ color: string }>`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: ${({ color }) => color};
-  margin-top: 6px;
-  flex-shrink: 0;
-`;
-
-const ActivityText = styled.div`
-  font-size: 13px;
-  color: #374151;
-  line-height: 1.5;
-`;
-
-const ActivityTime = styled.div`
-  font-size: 11px;
-  color: #9ca3af;
-  margin-top: 2px;
-`;
-
-const WelcomeBanner = styled.div`
-  background: linear-gradient(135deg, #1d4f7a 0%, #2E6DA4 100%);
-  border-radius: 12px;
-  padding: 24px 28px;
-  color: #fff;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const WelcomeText = styled.div``;
-
-const WelcomeTitle = styled.h2`
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0 0 4px;
-`;
-
-const WelcomeSubtitle = styled.p`
-  font-size: 14px;
-  opacity: 0.85;
-  margin: 0;
-`;
 
 interface Stats {
   totalClients: number;
@@ -120,7 +8,6 @@ interface Stats {
   hoursThisWeek: number;
   pendingApprovals: number;
 }
-
 interface Activity {
   id: number;
   action: string;
@@ -130,9 +17,46 @@ interface Activity {
   created_at: string;
 }
 
+const ACTION_COLORS: Record<string, string> = {
+  created: '#10b981',
+  updated: '#f59e0b',
+  deleted: '#ef4444',
+  approved: '#2E6DA4',
+  rejected: '#ef4444',
+};
+
+const KPI_ICONS: Record<string, string> = {
+  'Total Clients': '🏢',
+  'Active Campaigns': '📣',
+  'Hours This Week': '⏱',
+  'Pending Approvals': '🕐',
+};
+
+const KPI_COLORS: Record<string, string> = {
+  'Total Clients': '#2E6DA4',
+  'Active Campaigns': '#10b981',
+  'Hours This Week': '#f59e0b',
+  'Pending Approvals': '#ef4444',
+};
+
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - d.getTime()) / 60000);
+  if (diff < 1) return 'just now';
+  if (diff < 60) return `${diff}m ago`;
+  if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
+  return d.toLocaleDateString();
+}
+
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState<Stats>({ totalClients: 0, activeCampaigns: 0, hoursThisWeek: 0, pendingApprovals: 0 });
+  const [stats, setStats] = useState<Stats>({
+    totalClients: 0,
+    activeCampaigns: 0,
+    hoursThisWeek: 0,
+    pendingApprovals: 0,
+  });
   const [activity, setActivity] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -157,71 +81,127 @@ const DashboardPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const kpis = [
-    { label: 'Total Clients', value: stats.totalClients, icon: 'company' as const, color: '#2E6DA4' },
-    { label: 'Active Campaigns', value: stats.activeCampaigns, icon: 'chart' as const, color: '#10b981' },
-    { label: 'Hours This Week', value: stats.hoursThisWeek, icon: 'time-tracking' as const, color: '#f59e0b' },
-    { label: 'Pending Approvals', value: stats.pendingApprovals, icon: 'clock' as const, color: '#ef4444' },
-  ];
-
-  const actionColors: Record<string, string> = {
-    created: '#10b981',
-    updated: '#f59e0b',
-    deleted: '#ef4444',
-    approved: '#2E6DA4',
-    rejected: '#ef4444',
-  };
-
-  const formatTime = (iso: string) => {
-    const d = new Date(iso);
-    const now = new Date();
-    const diff = Math.floor((now.getTime() - d.getTime()) / 60000);
-    if (diff < 1) return 'just now';
-    if (diff < 60) return `${diff}m ago`;
-    if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
-    return d.toLocaleDateString();
+  const kpis = ['Total Clients', 'Active Campaigns', 'Hours This Week', 'Pending Approvals'];
+  const kpiValues: Record<string, number> = {
+    'Total Clients': stats.totalClients,
+    'Active Campaigns': stats.activeCampaigns,
+    'Hours This Week': stats.hoursThisWeek,
+    'Pending Approvals': stats.pendingApprovals,
   };
 
   return (
     <div>
-      <WelcomeBanner>
-        <WelcomeText>
-          <WelcomeTitle>Welcome back, {user?.name?.split(' ')[0]}!</WelcomeTitle>
-          <WelcomeSubtitle>Here's what's happening at Health Scale Digital today.</WelcomeSubtitle>
-        </WelcomeText>
-        <Icon name="home" size={48} style={{ opacity: 0.3 }} />
-      </WelcomeBanner>
+      {/* Welcome Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1d4f7a 0%, #2E6DA4 100%)',
+        borderRadius: 12,
+        padding: '24px 28px',
+        color: '#fff',
+        marginBottom: 28,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <div>
+          <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 4px' }}>
+            Welcome back, {user?.name?.split(' ')[0]}!
+          </h2>
+          <p style={{ fontSize: 14, opacity: 0.85, margin: 0 }}>
+            Here&apos;s what&apos;s happening at Health Scale Digital today.
+          </p>
+        </div>
+        <span style={{ fontSize: 48, opacity: 0.3 }}>🏠</span>
+      </div>
 
-      <Grid>
-        {kpis.map((kpi) => (
-          <KpiCard key={kpi.label}>
-            <KpiIcon>
-              <Icon name={kpi.icon} size={22} style={{ color: kpi.color }} />
-            </KpiIcon>
-            <KpiValue style={{ color: kpi.color }}>{loading ? '—' : kpi.value}</KpiValue>
-            <KpiLabel>{kpi.label}</KpiLabel>
-          </KpiCard>
+      {/* KPI Grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gap: 20,
+        marginBottom: 32,
+      }}>
+        {kpis.map((label) => (
+          <div key={label} style={{
+            background: '#fff',
+            borderRadius: 12,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}>
+            <div style={{
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              background: 'rgba(46,109,164,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 22,
+            }}>
+              {KPI_ICONS[label]}
+            </div>
+            <div style={{
+              fontSize: 36,
+              fontWeight: 700,
+              color: KPI_COLORS[label],
+              lineHeight: 1,
+              margin: '12px 0 4px',
+            }}>
+              {loading ? '—' : kpiValues[label]}
+            </div>
+            <div style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>
+              {label}
+            </div>
+          </div>
         ))}
-      </Grid>
+      </div>
 
-      <SectionTitle>Recent Activity</SectionTitle>
-      <ActivityCard>
+      {/* Recent Activity */}
+      <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a2e', margin: '0 0 16px' }}>
+        Recent Activity
+      </h2>
+      <div style={{
+        background: '#fff',
+        borderRadius: 12,
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        overflow: 'hidden',
+      }}>
         {activity.length === 0 && !loading && (
-          <div style={{ padding: '24px 20px', color: '#9ca3af', fontSize: 14 }}>No recent activity.</div>
+          <div style={{ padding: '24px 20px', color: '#9ca3af', fontSize: 14 }}>
+            No recent activity.
+          </div>
         )}
         {activity.map((a) => (
-          <ActivityItem key={a.id}>
-            <ActivityDot color={actionColors[a.action] || '#9ca3af'} />
+          <div key={a.id} style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 12,
+            padding: '14px 20px',
+            borderBottom: '1px solid #f3f4f6',
+          }}>
+            <div style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: ACTION_COLORS[a.action] || '#9ca3af',
+              marginTop: 6,
+              flexShrink: 0,
+            }} />
             <div>
-              <ActivityText>
-                <strong>{a.user_name}</strong> {a.action} {a.entity_type.replace('_', ' ')}{' '}
+              <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.5 }}>
+                <strong>{a.user_name}</strong>{' '}{a.action}{' '}
+                {a.entity_type.replace('_', ' ')}{' '}
                 <strong>{a.entity_name}</strong>
-              </ActivityText>
-              <ActivityTime>{formatTime(a.created_at)}</ActivityTime>
+              </div>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
+                {formatTime(a.created_at)}
+              </div>
             </div>
-          </ActivityItem>
+          </div>
         ))}
-      </ActivityCard>
+      </div>
     </div>
   );
 };

@@ -52,7 +52,7 @@ const StyledInput = styled.input`
   &:focus { border-color: #2E6DA4; }
 `;
 
-const Msg = styled.p<{ success?: boolean }>`
+const Msg = styled('p', { shouldForwardProp: (prop) => prop !== 'success' })<{ success?: boolean }>`
   font-size: 13px;
   color: ${({ success }) => (success ? '#16a34a' : '#dc2626')};
   padding: 8px 12px;
